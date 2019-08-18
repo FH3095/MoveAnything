@@ -149,6 +149,9 @@ local MovAny = {
 		["AlwaysUpFrame3"] = true,
 		["CompactRaidFrameManager"] = true,
 	},
+	lForceForbidden = {
+		["NamePlateTooltip"] = true,
+	},
 	lForcedLock = {
 		["Boss1TargetFrame"] = true,
 		["Boss2TargetFrame"] = true,
@@ -1347,6 +1350,18 @@ function MovAny:IsProtected(f)
 	end
 	local isProtected = f:IsProtected()
 	if isProtected or f.MAProtected or MovAny.lForceProtected[f:GetName()] then
+		return true
+	else
+		return nil
+	end
+end
+
+function MovAny:IsForbidden(f)
+	if not f then
+		return
+	end
+	local isForbidden = f:IsForbidden()
+	if isForbidden or MovAny.lForceForbidden[f:GetName()] then
 		return true
 	else
 		return nil
@@ -4079,7 +4094,7 @@ function MovAny:UnanchorRelatives(e, f, opt)
 		local children = {p:GetChildren()}
 		if children ~= nil then
 			for i, v in ipairs(children) do
-				if not v:IsForbidden() and not v:IsProtected() and v.GetPoint then
+				if not self:IsForbidden(v) and not self:IsProtected(v) and v.GetPoint then
 					self:_AddDependents(relatives, v)
 				end
 			end
